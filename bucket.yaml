@@ -1,0 +1,12 @@
+control-plane:
+  host: 0.0.0.0
+  port: "5000"
+  number-of-keys: 3
+  allowed-origins:
+  - http://localhost:8080
+  - http://api.example.com
+bucket:
+  filename: bucket
+  export:
+    allowed: true
+    compression: tar
