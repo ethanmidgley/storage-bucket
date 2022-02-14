@@ -22,6 +22,7 @@ func Start(ctx context.Context) {
 
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20
+	r.SetTrustedProxies(nil)
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = config.Conf.Yaml.ControlPlane.AllowedOrigins
