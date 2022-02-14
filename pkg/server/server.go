@@ -29,6 +29,7 @@ func Start(ctx context.Context) {
 
 	r.Use(cors.New(corsConfig))
 
+	r.POST("/generate", auth.IsHTAuthenticated(), controllers.CreateKeys)
 	r.POST("/upload", auth.IsAuthenticated(), controllers.Upload)
 	r.POST("/export", auth.IsAuthenticated(), controllers.Export)
 	r.POST("/delete", auth.IsAuthenticated(), controllers.Delete)

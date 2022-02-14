@@ -1,14 +1,10 @@
 package config
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 
-	"github.com/google/uuid"
 	"gopkg.in/yaml.v2"
 )
 
@@ -26,6 +22,7 @@ type YamlConfig struct {
 	ControlPlane struct {
 		Host           string   `yaml:"host"`
 		Port           string   `yaml:"port"`
+		HTPasswd       string   `yaml:"htpasswd"`
 		NumberOfKeys   int      `yaml:"number-of-keys"`
 		Keys           []string `yaml:"keys"`
 		AllowedOrigins []string `yaml:"allowed-origins"`
@@ -59,49 +56,26 @@ func Load() (*Config, error) {
 	c.Yaml = y
 
 	log.Println("Checking api keys")
-	c.CheckKey()
-
-	// load the keys to from the array to a map
-	for _, key := range c.Yaml.ControlPlane.Keys {
-		c.KeysMap[key] = true
+	if c.CheckKey() {
+		// load the keys to from the array to a map
+		for _, key := range c.Yaml.ControlPlane.Keys {
+			c.KeysMap[key] = true
+		}
+		log.Println("Keys found")
+	} else {
+		log.Printf("Keys were not found send a post request http://%s:%s/generate with your username and password set in the config to create api keys", c.Yaml.ControlPlane.Host, c.Yaml.ControlPlane.Port)
 	}
 
 	return c, nil
 }
 
 // CheckKey will make sure there is a key available
-func (c *Config) CheckKey() {
+func (c *Config) CheckKey() bool {
 	keysMissing := c.Yaml.ControlPlane.NumberOfKeys - len(c.Yaml.ControlPlane.Keys)
 	if keysMissing > 0 {
-		log.Println("Not enough api keys found generating the rest")
-
-		var keys []string
-
-		for i := 0; i < keysMissing; i++ {
-			key := GenerateNewKey()
-			keys = append(keys, key)
-			h := sha256.New()
-			h.Write([]byte(key))
-			c.Yaml.ControlPlane.Keys = append(c.Yaml.ControlPlane.Keys, hex.EncodeToString(h.Sum(nil)))
-		}
-
-		// we are going to save the key to a tempary file so we can use it
-		f, err := os.Create("api-keys.txt")
-		if err != nil {
-			log.Panic(err)
-		}
-		defer f.Close()
-
-		_, err = f.Write([]byte("Please delete this file once the key has been copied\nKeys:\n" + strings.Join(keys, "\n")))
-		if err != nil {
-			log.Panic(err)
-		}
-
-		c.Update()
-		log.Println("Missing keys generated")
-	} else {
-		log.Println("All keys found")
+		return false
 	}
+	return true
 
 }
 
@@ -116,13 +90,5 @@ func (c *Config) Update() {
 	}
 
 	ioutil.WriteFile("bucket.yaml", ce, 0644)
-
-}
-
-// GenerateNewKey will create a api key
-func GenerateNewKey() string {
-
-	u := uuid.New()
-	return u.String()
 
 }

@@ -1,0 +1,13 @@
+control-plane:
+  host: 0.0.0.0 # the bind address for the webserver to run on
+  port: "5000" # the port for the webserver to run on
+  number-of-keys: 3 # the number of keys to generate
+  htpasswd: ethan:$2y$10$ZzNgMqTwFCyCo3/YvsytMuiBCVJM0ZqsutsehY24niHD8UFrrc/my # htpasswd authentication for generate keys endpoint (bcrypt http)
+  allowed-origins: # cors origins
+  - http://localhost:8080
+  - http://api.example.com
+bucket:
+  filename: bucket # folder where all the files in bucket should be stored ( folder will automatically be created )
+  export:
+    allowed: true # should the bucket be allowed to export
+    compression: tar # the type of compressed file to use for the export valid options are (tar, zip)

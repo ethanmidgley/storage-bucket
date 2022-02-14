@@ -6,7 +6,7 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
-COPY *.go ./
+COPY . .
 
 RUN go build -o storage-bucket ./cmd/main.go
 
@@ -14,7 +14,8 @@ FROM gcr.io/distroless/base-debian10
 
 WORKDIR /
 
-COPY --from=build ./storage-bucket ./storage-bucket
+COPY --from=build /app/storage-bucket ./storage-bucket
+COPY bucket.yaml ./
 
 EXPOSE 5000
 

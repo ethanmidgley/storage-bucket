@@ -1,7 +1,12 @@
 control-plane:
   host: 0.0.0.0
   port: "5000"
+  htpasswd: ethan:$2y$10$ZzNgMqTwFCyCo3/YvsytMuiBCVJM0ZqsutsehY24niHD8UFrrc/my
   number-of-keys: 3
+  keys:
+  - 5b8c6a1c2eae4ef78da011715e672ea0c4486d70cb5b5bdc79559464793cd1cf
+  - 29a831c0e5421b4db40f2b9a52af14aa85785a34ba118c37b1281914a9bd31a0
+  - c8177d7ff6ac6e47e9baee09587a228a919d04a574c3adb58afc7b36f8ee0c6f
   allowed-origins:
   - http://localhost:8080
   - http://api.example.com
