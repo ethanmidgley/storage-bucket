@@ -13,8 +13,9 @@ var Conf *Config
 
 // Config global config variable
 type Config struct {
-	Yaml    *YamlConfig
-	KeysMap map[string]bool
+	Yaml       *YamlConfig
+	KeysMap    map[string]bool
+	PathPrefix string
 }
 
 // YamlConfig stuct for yaml file
@@ -37,11 +38,11 @@ type YamlConfig struct {
 }
 
 // Load config from the config.yaml file
-func Load() (*Config, error) {
-	c := &Config{KeysMap: make(map[string]bool)}
+func Load(pathPrefix string) (*Config, error) {
+	c := &Config{KeysMap: make(map[string]bool), PathPrefix: pathPrefix}
 	y := &YamlConfig{}
 
-	file, err := os.Open("bucket.yaml")
+	file, err := os.Open(pathPrefix + "/bucket.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -58,15 +59,20 @@ func Load() (*Config, error) {
 	log.Println("Checking api keys")
 	if c.CheckKey() {
 		// load the keys to from the array to a map
-		for _, key := range c.Yaml.ControlPlane.Keys {
-			c.KeysMap[key] = true
-		}
+		c.CreateKeyMap()
 		log.Println("Keys found")
 	} else {
 		log.Printf("Keys were not found send a post request http://%s:%s/generate with your username and password set in the config to create api keys", c.Yaml.ControlPlane.Host, c.Yaml.ControlPlane.Port)
 	}
 
 	return c, nil
+}
+
+// CreateKeyMap will take an array of keys and turn it in to a map for quicker authentication
+func (c *Config) CreateKeyMap() {
+	for _, key := range c.Yaml.ControlPlane.Keys {
+		c.KeysMap[key] = true
+	}
 }
 
 // CheckKey will make sure there is a key available
@@ -89,6 +95,6 @@ func (c *Config) Update() {
 		log.Panic(err)
 	}
 
-	ioutil.WriteFile("bucket.yaml", ce, 0644)
+	ioutil.WriteFile(c.PathPrefix+"/bucket.yaml", ce, 0644)
 
 }

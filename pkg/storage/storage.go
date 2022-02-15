@@ -15,13 +15,13 @@ import (
 
 // CheckBucket will make check to see if there is an active bucket
 func CheckBucket() bool {
-	_, err := os.Stat(config.Conf.Yaml.Bucket.Location)
+	_, err := os.Stat(config.Conf.PathPrefix + "/" + config.Conf.Yaml.Bucket.Location)
 	return !os.IsNotExist(err)
 }
 
 // CreateBucket will make a folder for the bucket according to config.yaml
 func CreateBucket() error {
-	if err := os.Mkdir(config.Conf.Yaml.Bucket.Location, 0755); err != nil {
+	if err := os.Mkdir(config.Conf.PathPrefix+"/"+config.Conf.Yaml.Bucket.Location, 0755); err != nil {
 		return err
 	}
 	log.Printf("Bucket created at %s", config.Conf.Yaml.Bucket.Location)
@@ -31,7 +31,7 @@ func CreateBucket() error {
 // FileExist will check to see if a file exists with the key provided
 func FileExist(key string) bool {
 
-	_, err := os.Stat(fmt.Sprintf("%s/%s", config.Conf.Yaml.Bucket.Location, key))
+	_, err := os.Stat(fmt.Sprintf("%s/%s/%s", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location, key))
 	return !os.IsNotExist(err)
 
 }
@@ -39,7 +39,7 @@ func FileExist(key string) bool {
 // Delete will delete a file from the bucket location
 func Delete(key string) error {
 
-	return os.Remove(fmt.Sprintf("%s/%s", config.Conf.Yaml.Bucket.Location, key))
+	return os.Remove(fmt.Sprintf("%s/%s/%s", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location, key))
 
 }
 
@@ -47,7 +47,7 @@ func Delete(key string) error {
 func Export() error {
 
 	if config.Conf.Yaml.Bucket.Export.Allowed {
-		files, err := ioutil.ReadDir(config.Conf.Yaml.Bucket.Location)
+		files, err := ioutil.ReadDir(config.Conf.PathPrefix + "/" + config.Conf.Yaml.Bucket.Location)
 		if err != nil {
 			return err
 		}
@@ -58,7 +58,7 @@ func Export() error {
 
 		if config.Conf.Yaml.Bucket.Export.Compression == "tar" {
 
-			newArchive, err := os.Create(fmt.Sprintf("%s.tar.gz", config.Conf.Yaml.Bucket.Location))
+			newArchive, err := os.Create(fmt.Sprintf("%s/%s.tar.gz", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location))
 			if err != nil {
 				return err
 			}
@@ -70,7 +70,7 @@ func Export() error {
 			defer tw.Close()
 
 			for _, file := range files {
-				err := addToArchive(tw, fmt.Sprintf("%s/%s", config.Conf.Yaml.Bucket.Location, file.Name()))
+				err := addToArchive(tw, fmt.Sprintf("%s/%s/%s", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location, file.Name()))
 				if err != nil {
 					return err
 				}
@@ -78,7 +78,7 @@ func Export() error {
 
 		} else {
 
-			newZipFile, err := os.Create(fmt.Sprintf("%s.zip", config.Conf.Yaml.Bucket.Location))
+			newZipFile, err := os.Create(fmt.Sprintf("%s/%s.zip", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location))
 			if err != nil {
 				return err
 			}
@@ -88,7 +88,7 @@ func Export() error {
 			defer zipwriter.Close()
 
 			for _, file := range files {
-				err := addFileToZip(zipwriter, fmt.Sprintf("%s/%s", config.Conf.Yaml.Bucket.Location, file.Name()))
+				err := addFileToZip(zipwriter, fmt.Sprintf("%s/%s/%s", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location, file.Name()))
 				if err != nil {
 					return err
 				}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -15,9 +16,12 @@ import (
 
 func main() {
 
+	pathPrefix := flag.String("pathPrefix", ".", "a prefix to add to all the paths in the code ( do not leave a trailing slash )")
+	flag.Parse()
+
 	// Load the config from the yaml file
 	log.Println("Loading bucket.yaml file")
-	conf, err := config.Load()
+	conf, err := config.Load(*pathPrefix)
 	if err != nil {
 		log.Panic(err)
 	}

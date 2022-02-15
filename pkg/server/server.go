@@ -36,7 +36,7 @@ func Start(ctx context.Context) {
 
 	files := r.Group("/files")
 	files.Use(auth.IsAuthenticated())
-	files.StaticFS("", http.Dir(config.Conf.Yaml.Bucket.Location))
+	files.StaticFS("", http.Dir(config.Conf.PathPrefix+"/"+config.Conf.Yaml.Bucket.Location))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", config.Conf.Yaml.ControlPlane.Host, config.Conf.Yaml.ControlPlane.Port),

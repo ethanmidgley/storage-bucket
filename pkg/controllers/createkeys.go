@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/ethanmidgley/storage-bucket/pkg/auth"
 	"github.com/ethanmidgley/storage-bucket/pkg/config"
 	"github.com/gin-gonic/gin"
@@ -14,7 +16,9 @@ func CreateKeys(c *gin.Context) {
 	}
 
 	keys, keyshashed := auth.GenerateKeys()
+	fmt.Println(keyshashed)
 	config.Conf.Yaml.ControlPlane.Keys = keyshashed
+	config.Conf.CreateKeyMap()
 	config.Conf.Update()
 
 	c.JSON(200, gin.H{"message": "keys generated successfully", "keys": keys})

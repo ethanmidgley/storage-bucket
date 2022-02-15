@@ -18,7 +18,7 @@ func Upload(c *gin.Context) {
 	for _, file := range files {
 		name := uuid.New().String()
 		fileKeys = append(fileKeys, name)
-		c.SaveUploadedFile(file, fmt.Sprintf("%s/%s", config.Conf.Yaml.Bucket.Location, name))
+		c.SaveUploadedFile(file, fmt.Sprintf("%s/%s/%s", config.Conf.PathPrefix, config.Conf.Yaml.Bucket.Location, name))
 	}
 	c.JSON(200, gin.H{"message": "uploaded all files", "file-keys": fileKeys})
 }
