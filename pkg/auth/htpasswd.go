@@ -57,7 +57,7 @@ func IsHTAuthenticated() gin.HandlerFunc {
 		}
 
 		username := strings.Split(string(userpass), ":")[0]
-		password := strings.Split(string(userpass), ":")[1]
+		password := strings.Join(strings.Split(string(userpass), ":")[1:], ":")
 
 		if !ValidateHTPasswd(username, password, config.Conf.Yaml.ControlPlane.HTPasswd) {
 			c.AbortWithStatusJSON(401, gin.H{"message": "invalid credentials"})
