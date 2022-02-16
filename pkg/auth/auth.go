@@ -3,7 +3,6 @@ package auth
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 
 	"github.com/ethanmidgley/storage-bucket/pkg/config"
 	"github.com/gin-gonic/gin"
@@ -20,7 +19,6 @@ func IsAuthenticated() gin.HandlerFunc {
 		}
 		h := sha256.New()
 		h.Write([]byte(keys[0]))
-		fmt.Println(config.Conf.KeysMap)
 
 		if _, ok := config.Conf.KeysMap[hex.EncodeToString(h.Sum(nil))]; !ok {
 			c.AbortWithStatusJSON(401, gin.H{"message": "invalid credentials"})
