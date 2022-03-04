@@ -29,6 +29,7 @@ func GenerateKeys() ([]string, []string) {
 // GenerateNewKey will create a api key
 func GenerateNewKey() string {
 
+	// calling google uuid libary
 	u := uuid.New()
 	return u.String()
 
